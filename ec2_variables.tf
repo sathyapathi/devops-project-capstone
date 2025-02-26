@@ -2,7 +2,7 @@ variable instance_name {
   description = "List of EC2 instance names (used as hostname)"
   type        = list(string)
   // # default     = ["k8-master1", "k8-worker1", "k8-worker2", "minikube"]
-  default     = ["jenkins1", "testserver1", "testserver2", "prodserver1"]
+  default     = ["jenkins1", "testserver1", "prodserver1"]
 }
 
 variable "aws_region" {
