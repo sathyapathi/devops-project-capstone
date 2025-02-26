@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        timeout(time: 30, unit: 'MINUTES')  // Pipeline will time out after 30 minutes
+    }
+
     environment {
         GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
         DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
@@ -26,7 +30,9 @@ pipeline {
             steps {
                 script {
                     echo "Building the Maven package..."
-                    sh "mvn clean package -Ddockerfile=${DOCKERFILE_NAME}"
+                    timeout(time: 10, unit: 'MINUTES') {  // Timeout for this step
+                        sh "mvn clean package -Ddockerfile=${DOCKERFILE_NAME}"
+                    }
                 }
             }
         }
@@ -58,12 +64,14 @@ pipeline {
             steps {
                 script {
                     echo "Deploying to test servers using Ansible..."
-                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
-                        sh """
-                            export DOCKER_USERNAME=${DOCKER_USER}
-                            export DOCKER_PASSWORD=${DOCKER_PASS}
-                            ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
-                        """
+                    timeout(time: 5, unit: 'MINUTES') {  // Timeout for deployment step
+                        withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
+                            sh """
+                                export DOCKER_USERNAME=${DOCKER_USER}
+                                export DOCKER_PASSWORD=${DOCKER_PASS}
+                                ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
+                            """
+                        }
                     }
                 }
             }
@@ -85,12 +93,14 @@ pipeline {
             steps {
                 script {
                     echo "Deploying to Prod servers using Ansible..."
-                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
-                        sh """
-                            export DOCKER_USERNAME=${DOCKER_USER}
-                            export DOCKER_PASSWORD=${DOCKER_PASS}
-                            ansible-playbook -i ${INVENTORY_SERVERS_PROD} ${ANSIBLE_PLAYBOOK_PROD}
-                        """
+                    timeout(time: 5, unit: 'MINUTES') {  // Timeout for production deployment
+                        withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
+                            sh """
+                                export DOCKER_USERNAME=${DOCKER_USER}
+                                export DOCKER_PASSWORD=${DOCKER_PASS}
+                                ansible-playbook -i ${INVENTORY_SERVERS_PROD} ${ANSIBLE_PLAYBOOK_PROD}
+                            """
+                        }
                     }
                 }
             }
