@@ -7,10 +7,9 @@ pipeline {
         DOCKERFILE_NAME = "Dockerfile_capstone"
         DOCKER_CREDENTIALS = "docker-hub-credentials" // Jenkins credentials ID for DockerHub
         INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
-		INVENTORY_SERVERS_PROD = "Server_Inventory_Prod.txt"
-        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-server.yml"
-		ANSIBLE_PLAYBOOK_PROD = "ansible_playbook_configure-test-server.yml"
-
+        INVENTORY_SERVERS_PROD = "Server_Inventory_Prod.txt"
+        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"
+        ANSIBLE_PLAYBOOK_PROD = "ansible_playbook_configure-prod-servers.yml"
     }
 
     stages {
@@ -46,8 +45,10 @@ pipeline {
                 script {
                     echo "Pushing Docker image to DockerHub..."
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
-                        sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
-                        sh "docker push ${DOCKER_IMAGE}"
+                        sh """
+                            echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
+                            docker push ${DOCKER_IMAGE}
+                        """
                     }
                 }
             }
@@ -56,7 +57,7 @@ pipeline {
         stage('Deploy to Test Servers') {
             steps {
                 script {
-                    echo "Deploying to test server using Ansible..."
+                    echo "Deploying to test servers using Ansible..."
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
                         sh """
                             export DOCKER_USERNAME=${DOCKER_USER}
@@ -67,11 +68,23 @@ pipeline {
                 }
             }
         }
-		
-		stage('Deploy to Prod Servers') {
+
+        stage('Approval for Production Deployment') {
+            when {
+                beforeAgent true
+                expression { return true }  // Always ask for approval before deploying to production
+            }
             steps {
                 script {
-                    echo "Deploying to test server using Ansible..."
+                    input message: "Deploy to Production?", ok: "Proceed"
+                }
+            }
+        }
+
+        stage('Deploy to Prod Servers') {
+            steps {
+                script {
+                    echo "Deploying to Prod servers using Ansible..."
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
                         sh """
                             export DOCKER_USERNAME=${DOCKER_USER}
@@ -79,6 +92,15 @@ pipeline {
                             ansible-playbook -i ${INVENTORY_SERVERS_PROD} ${ANSIBLE_PLAYBOOK_PROD}
                         """
                     }
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                script {
+                    echo "Cleaning up unused Docker images..."
+                    sh "docker system prune -f"
                 }
             }
         }
