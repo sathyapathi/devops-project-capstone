@@ -12,7 +12,7 @@ resource "aws_instance" "EC2-Creation" {
   }
 
   # Pass the instance name to userdata.sh dynamically
-  user_data = templatefile("userdata.sh", { instance_name = each.key })
+  user_data = templatefile("ec2_userdata.sh", { instance_name = each.key })
 }
 
 
