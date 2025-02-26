@@ -14,7 +14,7 @@
         state: present
 
     - name: Log in to DockerHub
-      command: docker login -u YOUR_DOCKERHUB_USERNAME -p YOUR_DOCKERHUB_PASSWORD
+      shell: echo "{{ lookup('env', 'DOCKER_PASSWORD') }}" | docker login -u "{{ lookup('env', 'DOCKER_USERNAME') }}" --password-stdin
       no_log: true
 
     - name: Pull the latest Docker image
