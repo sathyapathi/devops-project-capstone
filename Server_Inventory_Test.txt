@@ -1,2 +1,3 @@
 [test_servers]
 testserver1 ansible_host=172.31.81.101 ansible_user=ubuntu ansible_ssh_private_key_file=/var/lib/jenkins/.ssh/devops_demo.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+testserver2 ansible_host=172.31.90.155 ansible_user=ubuntu ansible_ssh_private_key_file=/var/lib/jenkins/.ssh/devops_demo.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'
