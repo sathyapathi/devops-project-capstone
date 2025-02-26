@@ -1,0 +1,12 @@
+# Terraform Validate
+1. terraform --version
+
+# Initialize Terraform
+1. Create provider.tf and update with the provider ex: aws/azure/etc
+2. terraform init
+3. terraform show
+
+# Git Validate
+1. git --version
+
+
