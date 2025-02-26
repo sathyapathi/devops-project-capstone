@@ -54,7 +54,13 @@ pipeline {
             steps {
                 script {
                     echo "Deploying to test server using Ansible..."
-                    sh "ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK}"
+                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
+                        sh """
+                            export DOCKER_USERNAME=${DOCKER_USER}
+                            export DOCKER_PASSWORD=${DOCKER_PASS}
+                            ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK}
+                        """
+                    }
                 }
             }
         }
