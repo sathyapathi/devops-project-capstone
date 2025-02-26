@@ -7,7 +7,10 @@ pipeline {
         DOCKERFILE_NAME = "Dockerfile_capstone"
         DOCKER_CREDENTIALS = "docker-hub-credentials" // Jenkins credentials ID for DockerHub
         INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
-        ANSIBLE_PLAYBOOK = "ansible_playbook_configure-test-server.yml"
+		INVENTORY_SERVERS_PROD = "Server_Inventory_Prod.txt"
+        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-server.yml"
+		ANSIBLE_PLAYBOOK_PROD = "ansible_playbook_configure-test-server.yml"
+
     }
 
     stages {
@@ -50,7 +53,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Test Server') {
+        stage('Deploy to Test Servers') {
             steps {
                 script {
                     echo "Deploying to test server using Ansible..."
@@ -58,7 +61,22 @@ pipeline {
                         sh """
                             export DOCKER_USERNAME=${DOCKER_USER}
                             export DOCKER_PASSWORD=${DOCKER_PASS}
-                            ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK}
+                            ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
+                        """
+                    }
+                }
+            }
+        }
+		
+		stage('Deploy to Prod Servers') {
+            steps {
+                script {
+                    echo "Deploying to test server using Ansible..."
+                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
+                        sh """
+                            export DOCKER_USERNAME=${DOCKER_USER}
+                            export DOCKER_PASSWORD=${DOCKER_PASS}
+                            ansible-playbook -i ${INVENTORY_SERVERS_PROD} ${ANSIBLE_PLAYBOOK_PROD}
                         """
                     }
                 }

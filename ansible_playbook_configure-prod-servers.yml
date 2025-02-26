@@ -1,6 +1,6 @@
 ---
-- name: Deploy Capstone App to Test Server
-  hosts: test_servers
+- name: Deploy Capstone App to Prod Servers
+  hosts: prod_servers
   become: true
   tasks:
   
