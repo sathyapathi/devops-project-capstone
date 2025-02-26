@@ -70,6 +70,9 @@ https://pkg.jenkins.io/debian binary/" | sudo tee \
 5. Validate
 jenkins --version
 
+########## Enable Jenkins to start automatically ##########
+
+
 6. Start and Enable Jenkins
 
 # sudo systemctl start jenkins
@@ -77,6 +80,8 @@ jenkins --version
 
 7. Check Jenkins status:
 # sudo systemctl status jenkins
+
+
 
 ########## Jenkins Configuration ##########
 1. Get the initial Jenkins Password
@@ -112,9 +117,19 @@ ansbile --version
 
 ########## configure private key for Ansible ##########
 
-1. sudo mv /home/ubuntu/devops_demo.pem /var/lib/jenkins/.ssh/devops_demo.pem
+sudo mkdir -p /var/lib/jenkins/.ssh
+sudo chown jenkins:jenkins /var/lib/jenkins/.ssh
+sudo chmod 700 /var/lib/jenkins/.ssh
+
+
+1. sudo cp /home/ubuntu/devops_demo.pem /var/lib/jenkins/.ssh/devops_demo.pem
 2. sudo chown jenkins:jenkins /var/lib/jenkins/.ssh/devops_demo.pem
 3. sudo chmod 400 /var/lib/jenkins/.ssh/devops_demo.pem
+
+
+########## Test Ansible Connection ##########
+
+ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt test_servers -m ping
 
 
 ########## xyz ##########

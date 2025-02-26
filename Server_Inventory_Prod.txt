@@ -1,2 +1,2 @@
 [prod_servers]
-prodserver1 ansible_host=172.31.84.15 ansible_user=ubuntu ansible_ssh_private_key_file=/var/lib/jenkins/.ssh/devops_demo.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+prodserver1 ansible_host=172.31.83.253 ansible_user=ubuntu ansible_ssh_private_key_file=/var/lib/jenkins/.ssh/devops_demo.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'
