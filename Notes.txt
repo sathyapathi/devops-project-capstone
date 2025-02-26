@@ -89,6 +89,7 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 2. Enter Initial Admin Password located in /var/lib/jenkins/secrets/initialAdminPassword 
 3. Installed Suggested Plugins
 4. create one user - admin
+5. whenver server IP changes, update IP address in Jenkins -> 
 
 
 
@@ -98,6 +99,22 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 docker --version
 
 
+########## Docker Permissions to Jenkins ##########
+
+1. sudo usermod -aG docker jenkins
+2. 
+
+
+########## Install Ansible ##########
+1. sudo apt update
+2. sudo apt install ansible
+ansbile --version
+
+########## configure private key for Ansible ##########
+
+1. sudo mv /home/ubuntu/devops_demo.pem /var/lib/jenkins/.ssh/devops_demo.pem
+2. sudo chown jenkins:jenkins /var/lib/jenkins/.ssh/devops_demo.pem
+3. sudo chmod 400 /var/lib/jenkins/.ssh/devops_demo.pem
 
 
 ########## xyz ##########

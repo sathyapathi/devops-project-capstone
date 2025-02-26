@@ -7,7 +7,7 @@ pipeline {
         DOCKERFILE_NAME = "Dockerfile_capstone"
         DOCKER_CREDENTIALS = "docker-hub-credentials" // Jenkins credentials ID for DockerHub
         INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
-        ANSIBLE_PLAYBOOK = "configure-test-server.yml"
+        ANSIBLE_PLAYBOOK = "ansible_playbook_configure-test-server.yml"
     }
 
     stages {
