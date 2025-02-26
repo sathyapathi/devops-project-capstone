@@ -1,6 +1,6 @@
-##### devops-project-capstone ######
+#################### devops-project-capstone ####################
 
-##### Terraform #########
+########## Terraform ##########
 
 # Terraform Validate
 1. terraform --version
@@ -9,9 +9,17 @@
 1. Create provider.tf and update with the provider ex: aws/azure/etc
 2. terraform init
 3. terraform show
+4. terraform test
 
 
-##### Git ############
+# Terraform Run
+
+1. terraform test
+2. terraform plan
+3. terraform apply
+
+
+########## Git ##########
 # Git Validate
 1. git --version
 
@@ -23,7 +31,7 @@
 
 
 
-##### Git commands ######
+########## Git commands ##########
 1. git status
 2. git add .
 3. git commit -m "Initial commit"
@@ -31,6 +39,83 @@
 5. git diff origin/main
 6. git push origin main
 
+########## Install Maven ##########
 
-######## New #####
+1. sudo apt update
+2. sudo apt install maven
+3. mvn --version
+4. java --version
+
+########## Install JAVA ##########
+1. It will be installed automatillcat when you install maven
+1. sudo apt update
+2. sudo apt install jdk20
+
+########## Install Jenkins ##########
+1. Add Jenkins GPG Key
+# curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | sudo tee \
+/usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+2. Add the Jenkins Repository
+# echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+https://pkg.jenkins.io/debian binary/" | sudo tee \
+/etc/apt/sources.list.d/jenkins.list > /dev/null
+
+3. update the package list
+# sudo apt update
+
+4. Install Jenkins
+# sudo apt install jenkins
+
+5. Validate
+jenkins --version
+
+6. Start and Enable Jenkins
+
+# sudo systemctl start jenkins
+# sudo systemctl enable jenkins
+
+7. Check Jenkins status:
+# sudo systemctl status jenkins
+
+########## Jenkins Configuration ##########
+1. Get the initial Jenkins Password
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+
+########## Access Jenkins & Configure ##########
+
+1. http://<server_ip>:8080
+2. Enter Initial Admin Password located in /var/lib/jenkins/secrets/initialAdminPassword 
+3. Installed Suggested Plugins
+4. create one user - admin
+
+
+
+########## Install Docker ##########
+1. sudo apt update
+2. sudo apt install docker.io
+docker --version
+
+
+
+
+########## xyz ##########
+
+
+
+
+
+
+
+
+
+
+
+
+###### Install Docker ######
+
+
+##### Install ansible #####
+1. sudo apt update
 

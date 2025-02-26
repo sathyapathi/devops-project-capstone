@@ -1,0 +1,45 @@
+- name: Setup Worker Node with Required Packages
+  hosts: workers
+  become: yes
+  tasks:
+
+    - name: Install required packages
+      apt:
+        name:
+          - git
+          - maven
+          - default-jdk
+          - docker.io
+          - tomcat10
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is started
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add user 'ubuntu' to the docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Restart SSH to apply group changes
+      shell: sleep 2 && service ssh restart
+      async: 1
+      poll: 0
+      ignore_errors: yes
+
+    - name: Pause to allow SSH restart
+      pause:
+        seconds: 5
+
+    - name: Pull AddressBook Docker Image Tag 1.0
+      command: docker pull shubhamkushwah123/addressbook:1.0
+      become: yes  # Run as root to avoid permission issues
+
+    - name: Run AddressBook Docker Container
+      command: docker run -d --name addressbook -p 8080:8080 shubhamkushwah123/addressbook:1.0
+      become: yes
