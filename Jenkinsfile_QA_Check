@@ -2,21 +2,21 @@ pipeline {
     agent any
 
     options {
-        timeout(time: 30, unit: 'MINUTES')  // Pipeline will time out after 30 minutes
+        timeout(time: 30, unit: 'MINUTES')  // Pipeline timeout
     }
 
-    //Environment Variables
-	environment {
+    // Environment Variables
+    environment {
         GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
         DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
         DOCKERFILE_NAME = "Dockerfile_capstone"
-        DOCKER_CREDENTIALS = "docker-hub-credentials" // Jenkins credentials ID for DockerHub
+        DOCKER_CREDENTIALS = "docker-hub-credentials"
+        DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"  // Path to reusable Docker authentication script
         INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
-        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"        
+        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"
     }
 
-    
-	stages {
+    stages {
         stage('Checkout') {
             steps {
                 script {
@@ -24,15 +24,20 @@ pipeline {
                     git branch: 'main', url: "${GIT_REPO}"
                 }
             }
-        }        
-      
+        }
 
-        
+        stage('Docker Authentication') {
+            steps {
+                script {
+                    echo "Authenticating with DockerHub..."
+                    def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
+                    dockerAuth.dockerLogin(DOCKER_CREDENTIALS)  // Authenticate to DockerHub
+                }
+            }
+        }
     }
 
-    
-	
-	post {
+    post {
         success {
             echo "Pipeline completed successfully!"
         }

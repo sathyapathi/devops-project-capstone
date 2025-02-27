@@ -2,15 +2,15 @@ pipeline {
     agent any
 
     options {
-        timeout(time: 30, unit: 'MINUTES')  // Pipeline will time out after 30 minutes
+        timeout(time: 30, unit: 'MINUTES')  // Pipeline timeout
     }
 
-    //Environment Variables
-	environment {
+    environment {
         GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
         DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
         DOCKERFILE_NAME = "Dockerfile_capstone"
-        DOCKER_CREDENTIALS = "docker-hub-credentials" // Jenkins credentials ID for DockerHub
+        DOCKER_CREDENTIALS = "docker-hub-credentials"
+        DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"  // Path to Docker authentication script
         INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
         INVENTORY_SERVERS_PROD = "Server_Inventory_Prod.txt"
         ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"
@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
                     echo "Building the Maven package..."
-                    timeout(time: 10, unit: 'MINUTES') {  // Timeout for this step
+                    timeout(time: 10, unit: 'MINUTES') {
                         sh "mvn clean package -Ddockerfile=${DOCKERFILE_NAME}"
                     }
                 }
@@ -51,35 +51,30 @@ pipeline {
             steps {
                 script {
                     echo "Pushing Docker image to DockerHub..."
-                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
+                    def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load external script using variable
+                    dockerAuth.dockerLogin(DOCKER_CREDENTIALS)
+                    sh "docker push ${DOCKER_IMAGE}"
+                }
+            }
+        }
+
+        stage('Deploy to Test Servers') {
+            steps {
+                script {
+                    echo "Deploying to test servers using Ansible..."
+                    timeout(time: 5, unit: 'MINUTES') {
+                        def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load external script using variable
+                        dockerAuth.dockerLogin(DOCKER_CREDENTIALS)
                         sh """
-                            echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-                            docker push ${DOCKER_IMAGE}
+                            export DOCKER_USERNAME=${DOCKER_USER}
+                            export DOCKER_PASSWORD=${DOCKER_PASS}
+                            ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
                         """
                     }
                 }
             }
         }
-		
-		
-		// Rollout to Test Environment Servers
-        stage('Deploy to Test Servers') {
-            steps {
-                script {
-                    echo "Deploying to test servers using Ansible..."
-                    timeout(time: 5, unit: 'MINUTES') {  // Timeout for deployment step
-                        withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
-                            sh """
-                                export DOCKER_USERNAME=${DOCKER_USER}
-                                export DOCKER_PASSWORD=${DOCKER_PASS}
-                                ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
-                            """
-                        }
-                    }
-                }
-            }
-        }
-        
+
         stage('Cleanup') {
             steps {
                 script {

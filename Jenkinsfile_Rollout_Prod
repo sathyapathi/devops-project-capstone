@@ -2,16 +2,20 @@ pipeline {
     agent any
 
     options {
-        timeout(time: 30, unit: 'MINUTES')  // Pipeline will time out after 30 minutes
+        timeout(time: 30, unit: 'MINUTES')  // Pipeline timeout
     }
 
+    // Environment Variables
     environment {
         GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
         DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
         DOCKERFILE_NAME = "Dockerfile_capstone"
-        DOCKER_CREDENTIALS = "docker-hub-credentials" // Jenkins credentials ID for DockerHub
+        DOCKER_CREDENTIALS = "docker-hub-credentials"
+        DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"  // Path to reusable Docker authentication script
         INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
-        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"        
+        INVENTORY_SERVERS_PROD = "Server_Inventory_Prod.txt"
+        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"
+        ANSIBLE_PLAYBOOK_PROD = "ansible_playbook_configure-prod-servers.yml"
     }
 
     stages {
@@ -24,7 +28,7 @@ pipeline {
             }
         }
 
-        // Explict approvals for pushing before Production Servers       
+        // Explicit approval for production deployment (commented out for now)
         /*
         stage('Approval for Production Deployment') {
             when {
@@ -37,22 +41,19 @@ pipeline {
                 }
             }
         }
-		*/
-		
-		
-		// Rollout to Production Servers
+        */
+
+        // Rollout to Production Servers
         stage('Deploy to Prod Servers') {
             steps {
                 script {
-                    echo "Deploying to Prod servers using Ansible..."
-                    timeout(time: 5, unit: 'MINUTES') {  // Timeout for production deployment
-                        withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
-                            sh """
-                                export DOCKER_USERNAME=${DOCKER_USER}
-                                export DOCKER_PASSWORD=${DOCKER_PASS}
-                                ansible-playbook -i ${INVENTORY_SERVERS_PROD} ${ANSIBLE_PLAYBOOK_PROD}
-                            """
-                        }
+                    echo "Deploying to Production servers using Ansible..."
+                    timeout(time: 5, unit: 'MINUTES') {
+                        def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
+                        dockerAuth.dockerLogin(DOCKER_CREDENTIALS)  // Authenticate to DockerHub
+                        sh """
+                            ansible-playbook -i ${INVENTORY_SERVERS_PROD} ${ANSIBLE_PLAYBOOK_PROD}
+                        """
                     }
                 }
             }
