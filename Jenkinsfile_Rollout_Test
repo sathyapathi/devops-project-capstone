@@ -5,7 +5,8 @@ pipeline {
         timeout(time: 30, unit: 'MINUTES')  // Pipeline will time out after 30 minutes
     }
 
-    environment {
+    //Environment Variables
+	environment {
         GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
         DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
         DOCKERFILE_NAME = "Dockerfile_capstone"
@@ -59,7 +60,9 @@ pipeline {
                 }
             }
         }
-
+		
+		
+		// Rollout to Test Environment Servers
         stage('Deploy to Test Servers') {
             steps {
                 script {
@@ -76,36 +79,7 @@ pipeline {
                 }
             }
         }
-
-        stage('Approval for Production Deployment') {
-            when {
-                beforeAgent true
-                expression { return true }  // Always ask for approval before deploying to production
-            }
-            steps {
-                script {
-                    input message: "Deploy to Production?", ok: "Proceed"
-                }
-            }
-        }
-
-        stage('Deploy to Prod Servers') {
-            steps {
-                script {
-                    echo "Deploying to Prod servers using Ansible..."
-                    timeout(time: 5, unit: 'MINUTES') {  // Timeout for production deployment
-                        withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
-                            sh """
-                                export DOCKER_USERNAME=${DOCKER_USER}
-                                export DOCKER_PASSWORD=${DOCKER_PASS}
-                                ansible-playbook -i ${INVENTORY_SERVERS_PROD} ${ANSIBLE_PLAYBOOK_PROD}
-                            """
-                        }
-                    }
-                }
-            }
-        }
-
+        
         stage('Cleanup') {
             steps {
                 script {

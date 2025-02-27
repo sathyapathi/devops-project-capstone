@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')  // Pipeline will time out after 30 minutes
+    }
+
+    //Environment Variables
+	environment {
+        GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
+        DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
+        DOCKERFILE_NAME = "Dockerfile_capstone"
+        DOCKER_CREDENTIALS = "docker-hub-credentials" // Jenkins credentials ID for DockerHub
+        INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
+        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"        
+    }
+
+    
+	stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "Cloning the repository..."
+                    git branch: 'main', url: "${GIT_REPO}"
+                }
+            }
+        }        
+      
+
+        
+    }
+
+    
+	
+	post {
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed. Please check the logs."
+        }
+    }
+}

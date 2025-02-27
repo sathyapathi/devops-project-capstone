@@ -132,15 +132,6 @@ sudo chmod 700 /var/lib/jenkins/.ssh
 ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt test_servers -m ping
 
 
-########## xyz ##########
-
-
-
-
-
-
-
-
 
 
 
@@ -151,3 +142,46 @@ ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt 
 ##### Install ansible #####
 1. sudo apt update
 
+
+
+########## Jenkins Pipeline configuration START ##########
+
+## Test Envinronment
+1. Project Name: Capstone-Test-Env
+2. Triigers: GitHub hook trigger for GISTcm polling
+3. Pipeline : 
+		Defination: Pipeline script from SCM
+			SCM: Git 
+				Repository : <repo URL>
+				Branches : */main
+				Script Path : Jenkinsfile_Rollout_Prod
+
+
+## Testing - QA Check - Run Test Cases
+1. Project Name: Capstone-QA-Check
+2. Triigers: Build after other projects are built
+		Projects to Watch: Capstone-Test-Env, 
+		Trigger only if build is stable : checkbox
+3. Pipeline : 
+		Defination: Pipeline script from SCM
+			SCM: Git 
+				Repository : <repo URL>
+				Branches : */main
+				Script Path : Jenkinsfile_QA_Check
+				
+## Deploy to Prod Envinronment
+1. Project Name: Capstone-Prod-Env
+2. Triigers: Build after other projects are built
+		Projects to Watch: Capstone-QA-Check,, 
+		Trigger only if build is stable : checkbox
+3. Pipeline : 
+		Defination: Pipeline script from SCM
+			SCM: Git 
+				Repository : <repo URL>
+				Branches : */main
+				Script Path : Jenkinsfile_Rollout_Prod
+				
+
+
+
+########## Jenkins Pipeline configuration END ##########
