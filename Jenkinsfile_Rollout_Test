@@ -9,7 +9,6 @@ pipeline {
         GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
         DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
         DOCKERFILE_NAME = "Dockerfile_capstone"
-        DOCKER_CREDENTIALS = "docker-hub-credentials"
         DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"  // Path to Docker authentication script
         INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
         INVENTORY_SERVERS_PROD = "Server_Inventory_Prod.txt"
@@ -51,8 +50,8 @@ pipeline {
             steps {
                 script {
                     echo "Pushing Docker image to DockerHub..."
-                    def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load external script using variable
-                    dockerAuth.dockerLogin(DOCKER_CREDENTIALS)
+                    def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load external script
+                    dockerAuth.dockerLogin()
                     sh "docker push ${DOCKER_IMAGE}"
                 }
             }
@@ -63,13 +62,15 @@ pipeline {
                 script {
                     echo "Deploying to test servers using Ansible..."
                     timeout(time: 5, unit: 'MINUTES') {
-                        def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load external script using variable
-                        dockerAuth.dockerLogin(DOCKER_CREDENTIALS)
-                        sh """
-                            export DOCKER_USERNAME=${DOCKER_USER}
-                            export DOCKER_PASSWORD=${DOCKER_PASS}
-                            ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
-                        """
+                        def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load external script
+                        dockerAuth.dockerLogin()
+                        withCredentials([usernamePassword(credentialsId: dockerAuth.getCredentialsId(), usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
+                            sh """
+                                export DOCKER_USERNAME=${DOCKER_USER}
+                                export DOCKER_PASSWORD=${DOCKER_PASS}
+                                ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
+                            """
+                        }
                     }
                 }
             }

@@ -10,11 +10,8 @@ pipeline {
         GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
         DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
         DOCKERFILE_NAME = "Dockerfile_capstone"
-        DOCKER_CREDENTIALS = "docker-hub-credentials"
         DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"  // Path to reusable Docker authentication script
-        INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
         INVENTORY_SERVERS_PROD = "Server_Inventory_Prod.txt"
-        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"
         ANSIBLE_PLAYBOOK_PROD = "ansible_playbook_configure-prod-servers.yml"
     }
 
@@ -50,7 +47,7 @@ pipeline {
                     echo "Deploying to Production servers using Ansible..."
                     timeout(time: 5, unit: 'MINUTES') {
                         def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
-                        dockerAuth.dockerLogin(DOCKER_CREDENTIALS)  // Authenticate to DockerHub
+                        dockerAuth.dockerLogin()  // Authenticate to DockerHub
                         sh """
                             ansible-playbook -i ${INVENTORY_SERVERS_PROD} ${ANSIBLE_PLAYBOOK_PROD}
                         """
