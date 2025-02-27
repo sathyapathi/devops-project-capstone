@@ -14,9 +14,9 @@
         state: present
 
     - name: Log in to DockerHub
-      shell: echo "{{ lookup('env', 'DOCKER_PASSWORD') }}" | docker login -u "{{ lookup('env', 'DOCKER_USERNAME') }}" --password-stdin
+      shell: echo "{{ docker_password }}" | docker login -u "{{ docker_username }}" --password-stdin
       no_log: true
-
+    
     - name: Pull the latest Docker image
       command: docker pull sathyapathi/capstone-image:1.0
 
