@@ -154,7 +154,7 @@ ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt 
 			SCM: Git 
 				Repository : <repo URL>
 				Branches : */main
-				Script Path : Jenkinsfile_Rollout_Prod
+				Script Path : Jenkinsfile_Rollout_Test
 
 
 ## Testing - QA Check - Run Test Cases
