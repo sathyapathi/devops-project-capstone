@@ -6,7 +6,7 @@
   
     - name: Update apt package index
       apt:
-       update_cache: yes
+        update_cache: yes
 
     - name: Install Docker (if not installed)
       apt:
@@ -14,9 +14,9 @@
         state: present
 
     - name: Log in to DockerHub
-      shell: echo "{{ docker_password }}" | docker login -u "{{ docker_username }}" --password-stdin
+      shell: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       no_log: true
-    
+
     - name: Pull the latest Docker image
       command: docker pull sathyapathi/capstone-image:1.0
 

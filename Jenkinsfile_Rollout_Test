@@ -49,7 +49,7 @@ pipeline {
                 script {
                     echo "Pushing Docker image to DockerHub..."
                     def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
-                    dockerAuth.dockerLogin()  // Call login function without passing credentials ID
+                    dockerAuth.dockerLogin()  // Authenticate to DockerHub
                     sh "docker push ${DOCKER_IMAGE}"
                 }
             }
@@ -61,10 +61,15 @@ pipeline {
                     echo "Deploying to test servers using Ansible..."
                     timeout(time: 5, unit: 'MINUTES') {
                         def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
-                        dockerAuth.dockerLogin()  // Authenticate before running Ansible
-                        sh """
-                            ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
-                        """
+                        def creds = dockerAuth.getDockerCredentials() // Fetch credentials dynamically
+
+                        withCredentials([usernamePassword(credentialsId: creds.credentialsId, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                            sh """
+                                export DOCKER_USERNAME="$DOCKER_USERNAME"
+                                export DOCKER_PASSWORD="$DOCKER_PASSWORD"
+                                ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
+                            """
+                        }
                     }
                 }
             }
