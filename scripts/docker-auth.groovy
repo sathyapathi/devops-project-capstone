@@ -1,6 +1,6 @@
 // scripts/docker-auth.groovy
 
-// Define DockerHub credentials ID in a separate variable for easy updates
+// Store the DockerHub credentials ID in a single variable for easy updates
 def DOCKER_HUB_CREDENTIALS_ID = "docker-hub-credentials"
 
 // Function to log in to DockerHub using Jenkins credentials
@@ -12,5 +12,10 @@ def dockerLogin() {
     }
 }
 
-// Expose the variable in case other scripts need to use it
+// Function to return the credentials ID (for external use if needed)
+def getDockerCredentialsId() {
+    return DOCKER_HUB_CREDENTIALS_ID
+}
+
+// Expose the functions to be used in Jenkinsfile
 return this
