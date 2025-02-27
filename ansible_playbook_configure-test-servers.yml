@@ -3,8 +3,8 @@
   hosts: test_servers
   become: true
   vars:
-    docker_username: "{{ lookup('env', 'DOCKER_USER') }}"
-    docker_password: "{{ lookup('env', 'DOCKER_PASS') }}"
+    docker_username: "{{ docker_username }}"
+    docker_password: "{{ docker_password }}"
 
   tasks:
     - name: Update apt package index
