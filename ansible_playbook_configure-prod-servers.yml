@@ -3,10 +3,10 @@
   hosts: prod_servers
   become: true
   tasks:
-  
+
     - name: Update apt package index
       apt:
-       update_cache: yes
+        update_cache: yes
 
     - name: Install Docker (if not installed)
       apt:
