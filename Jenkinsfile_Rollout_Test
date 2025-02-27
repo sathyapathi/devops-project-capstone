@@ -9,11 +9,9 @@ pipeline {
         GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
         DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
         DOCKERFILE_NAME = "Dockerfile_capstone"
-        DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"  // Path to Docker authentication script
+        DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"  // Path to reusable Docker authentication script
         INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
-        INVENTORY_SERVERS_PROD = "Server_Inventory_Prod.txt"
         ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"
-        ANSIBLE_PLAYBOOK_PROD = "ansible_playbook_configure-prod-servers.yml"
     }
 
     stages {
@@ -50,8 +48,8 @@ pipeline {
             steps {
                 script {
                     echo "Pushing Docker image to DockerHub..."
-                    def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load external script
-                    dockerAuth.dockerLogin()
+                    def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
+                    dockerAuth.dockerLogin()  // Call login function without passing credentials ID
                     sh "docker push ${DOCKER_IMAGE}"
                 }
             }
@@ -62,15 +60,11 @@ pipeline {
                 script {
                     echo "Deploying to test servers using Ansible..."
                     timeout(time: 5, unit: 'MINUTES') {
-                        def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load external script
-                        dockerAuth.dockerLogin()
-                        withCredentials([usernamePassword(credentialsId: dockerAuth.getCredentialsId(), usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
-                            sh """
-                                export DOCKER_USERNAME=${DOCKER_USER}
-                                export DOCKER_PASSWORD=${DOCKER_PASS}
-                                ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
-                            """
-                        }
+                        def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
+                        dockerAuth.dockerLogin()  // Authenticate before running Ansible
+                        sh """
+                            ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
+                        """
                     }
                 }
             }
