@@ -9,7 +9,7 @@ pipeline {
         GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
         DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
         DOCKERFILE_NAME = "Dockerfile_capstone"
-        DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"  // Path to reusable Docker authentication script
+        DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"
         INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
         ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"
     }
@@ -49,7 +49,7 @@ pipeline {
                 script {
                     echo "Pushing Docker image to DockerHub..."
                     def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
-                    dockerAuth.dockerLogin()  // Authenticate to DockerHub
+                    dockerAuth.dockerLogin()
                     sh "docker push ${DOCKER_IMAGE}"
                 }
             }
@@ -60,16 +60,14 @@ pipeline {
                 script {
                     echo "Deploying to test servers using Ansible..."
                     timeout(time: 5, unit: 'MINUTES') {
-                        def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
-                        def creds = dockerAuth.getDockerCredentials() // Fetch credentials dynamically
+                        def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  
+                        dockerAuth.dockerLogin()
 
-                        withCredentials([usernamePassword(credentialsId: creds.credentialsId, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                            sh """
-                                export DOCKER_USERNAME="$DOCKER_USERNAME"
-                                export DOCKER_PASSWORD="$DOCKER_PASSWORD"
-                                ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST}
-                            """
-                        }
+                        // Pass credentials as environment variables to Ansible
+                        sh """
+                            ansible-playbook -i ${INVENTORY_SERVERS_TEST} ${ANSIBLE_PLAYBOOK_TEST} \
+                            --extra-vars "@$WORKSPACE/docker_env.sh"
+                        """
                     }
                 }
             }

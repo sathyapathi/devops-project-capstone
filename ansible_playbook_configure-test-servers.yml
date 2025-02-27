@@ -2,8 +2,11 @@
 - name: Deploy Capstone App to Test Servers
   hosts: test_servers
   become: true
+  vars:
+    docker_username: "{{ lookup('env', 'DOCKER_USER') }}"
+    docker_password: "{{ lookup('env', 'DOCKER_PASS') }}"
+
   tasks:
-  
     - name: Update apt package index
       apt:
         update_cache: yes
@@ -14,7 +17,7 @@
         state: present
 
     - name: Log in to DockerHub
-      shell: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      shell: echo "{{ docker_password }}" | docker login -u "{{ docker_username }}" --password-stdin
       no_log: true
 
     - name: Pull the latest Docker image
