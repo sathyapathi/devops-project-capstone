@@ -6,15 +6,18 @@ pipeline {
     }
 
     environment {
-        GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone.git"
-        DOCKER_IMAGE = "sathyapathi/capstone-image:1.0"
-        DOCKERFILE_NAME = "Dockerfile_capstone"
-        DOCKER_AUTH_SCRIPT = "scripts/docker-auth.groovy"  // Path to reusable Docker authentication script
-        INVENTORY_SERVERS_TEST = "Server_Inventory_Test.txt"
-        ANSIBLE_PLAYBOOK_TEST = "ansible_playbook_configure-test-servers.yml"
+        GIT_REPO = "https://github.com/sathyapathi/devops-project-capstone-testing.git"
     }
 
     stages {
+        stage('Cleanup Workspace') {
+            steps {
+                echo "Cleaning workspace before build..."
+                sh 'git clean -fdx'  // Remove untracked files and directories
+                sh 'rm -rf target/'  // Remove old build artifacts
+            }
+        }
+
         stage('Checkout') {
             steps {
                 script {
@@ -24,13 +27,24 @@ pipeline {
             }
         }
 
-        stage('Docker Authentication') {
+        stage('Build Selenium App') {
             steps {
-                script {
-                    echo "Authenticating with DockerHub..."
-                    def dockerAuth = load "${DOCKER_AUTH_SCRIPT}"  // Load reusable script
-                    dockerAuth.dockerLogin()  // Call authentication function
-                }
+                echo "Building the Selenium Package..."
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Verify Artifact') {
+            steps {
+                echo "Checking if the correct JAR file was created..."
+                sh 'ls -l target/'
+            }
+        }
+
+        stage('Execute Selenium Testscript') {
+            steps {
+                echo "Executing Selenium Testscript..."
+                sh 'java -jar target/insure-me-test-1.0.jar'
             }
         }
     }
