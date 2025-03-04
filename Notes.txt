@@ -1,8 +1,8 @@
 #################### devops-project-capstone ####################
 
 ########## Git Repositories ##########
-https://github.com/sathyapathi/devops-project-capstone.git
-https://github.com/sathyapathi/devops-project-capstone-testing.git
+Project Repo: https://github.com/sathyapathi/devops-project-capstone.git
+Selnium Testing Repo: https://github.com/sathyapathi/devops-project-capstone-testing.git
 
 ########## Terraform ##########
 
