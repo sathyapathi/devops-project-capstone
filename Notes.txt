@@ -162,8 +162,19 @@ ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt 
 
 ########## Install Google Chrome Driver ##########
 
-ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt test_servers -m ping
+1. sudo apt update
+2. sudo apt install -y google-chrome-stable
+3. google-chrome --version
 
+If the above doesn't work, install it manually
+
+
+1. sudo apt update
+2. wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+3. sudo apt install wget
+4. sudo dpkg -i google-chrome-stable_current_amd64.deb
+5. sudo apt-get install -f
+6. google-chrome --version
 
 
 
@@ -177,6 +188,8 @@ ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt 
 
 
 
+
+
 ########## Jenkins Pipeline configuration START ##########
 
 
@@ -186,7 +199,7 @@ ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt 
 3. Pipeline : 
 		Defination: Pipeline script from SCM
 			SCM: Git 
-				Repository : <repo URL>
+				Repository : https://github.com/sathyapathi/devops-project-capstone.git
 				Branches : */main
 				Script Path : Jenkinsfile_Rollout_Test
 
@@ -199,7 +212,7 @@ ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt 
 3. Pipeline : 
 		Defination: Pipeline script from SCM
 			SCM: Git 
-				Repository : <repo URL>
+				Repository : https://github.com/sathyapathi/devops-project-capstone.git
 				Branches : */main
 				Script Path : Jenkinsfile_QA_Check
 				
@@ -212,7 +225,7 @@ ansible -i /var/lib/jenkins/workspace/DevOps-Capstone/Server_Inventory_Test.txt 
 3. Pipeline : 
 		Defination: Pipeline script from SCM
 			SCM: Git 
-				Repository : <repo URL>
+				Repository : https://github.com/sathyapathi/devops-project-capstone.git
 				Branches : */main
 				Script Path : Jenkinsfile_Rollout_Prod
 				
