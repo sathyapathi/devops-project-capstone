@@ -187,6 +187,23 @@ If the above doesn't work, install it manually
 1. sudo apt update
 
 
+########## DockerHub Credentials ID in Jenkins ##########
+1. Open Jenkins Credentials Configuration
+Log in to Jenkins.
+Click on Manage Jenkins (left sidebar).
+Select Manage Credentials.
+Under Stores scoped to Jenkins, click on (global).
+Click on Add Credentials (left menu).
+
+2. Add DockerHub Credentials
+Kind: Select Username and password.
+Scope: Keep it as Global (so it can be used anywhere in Jenkins).
+Username: Enter your DockerHub username.
+Password: Enter your DockerHub access token (recommended) or password.
+ID: Enter docker-hub-credentials (this must match the variable used in the Jenkinsfile).
+Description: Enter something like DockerHub Credentials for Jenkins.
+
+
 
 
 
@@ -266,6 +283,7 @@ Webhooks → Full control ✅ (Allows Jenkins to trigger builds when changes are
 4. Click OK.
 
 
+
 ##  Configure Jenkins Job to Use Webhook
 1. Go to Jenkins Dashboard.
 2. Open the Job (Pipeline) you want to trigger.
@@ -305,3 +323,7 @@ Webhooks → Full control ✅ (Allows Jenkins to trigger builds when changes are
 
 
 ########## Gitgub to invoke pipeline in Jenkins automatically END ##########
+
+
+########## Misc ##########
+
