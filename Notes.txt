@@ -235,4 +235,73 @@ If the above doesn't work, install it manually
 ########## Jenkins Pipeline configuration END ##########
 
 
-#Test
+########## Gitgub to invoke pipeline in Jenkins automatically START ##########
+
+##  Generate a New Personal Access Token (PAT)
+
+1. create PAT and copy the PAT key
+2. Under "Repository access"
+Select "Only select repositories"
+Choose your repository (devops-project-capstone)
+
+3. Under "Repository permissions"
+Enable the following:
+Contents → Read-only ✅ (Allows Jenkins to fetch code from the repository)
+Metadata → Read-only ✅ (Required for repository access)
+Webhooks → Full control ✅ (Allows Jenkins to trigger builds when changes are pushed)
+
+4. 4️⃣ Generate and Copy the Token
+
+##  Add GitHub Credentials to Jenkins
+
+1. Open Jenkins: http://54.167.216.49:8080/manage/
+2. Go to Manage Jenkins → Manage Credentials.
+3. Click (global) → Add Credentials.
+	Fill in the details:
+	Kind: Username with password
+	Username: Your GitHub username
+	Password: Paste the PAT_for_Jenkins token
+	ID (Optional): github-jenkins-token
+	Description: GitHub PAT for Jenkins
+4. Click OK.
+
+
+##  Configure Jenkins Job to Use Webhook
+1. Go to Jenkins Dashboard.
+2. Open the Job (Pipeline) you want to trigger.
+3. Click Configure.
+	Under "Build Triggers", select:
+	GitHub hook trigger for GITScm polling (Enables webhook triggers)
+4. Click Save.
+
+
+## Create a GitHub Webhook
+1. Go to GitHub Repository: https://github.com/sathyapathi/devops-project-capstone
+2. Click Settings → Webhooks.
+3. Click Add webhook.
+	Enter Webhook URL: http://54.167.216.49:8080/github-webhook/
+	Content type: application/json
+	Triggers: Select Just the push event.
+	Secret: Leave it blank (Jenkins doesn’t need it).
+	SSL Verification: Keep default.
+4. Click Add Webhook.
+
+
+## Test the Webhook
+1. In GitHub Repository Settings → Webhooks, find the new webhook.
+2. Click Recent Deliveries.
+	If it shows ✔️ 200 OK, the webhook is working!
+	If it fails (❌ 500 error):
+	Check Jenkins logs:
+	cat /var/log/jenkins/jenkins.log
+	Ensure Jenkins is publicly accessible at http://54.167.216.49:8080.
+	Verify that GitHub plugin is installed in Jenkins.
+
+## Validate the Integration
+1. Make a test commit in your GitHub repo:
+	#git commit --allow-empty -m "Trigger Jenkins Webhook"
+	#git push origin main
+2. Jenkins should start the pipeline automatically.
+
+
+########## Gitgub to invoke pipeline in Jenkins automatically END ##########
