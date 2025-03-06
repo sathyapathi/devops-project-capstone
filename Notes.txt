@@ -121,7 +121,7 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 2. Enter Initial Admin Password located in /var/lib/jenkins/secrets/initialAdminPassword 
 3. Installed Suggested Plugins
 4. create one user - admin
-5. whenver server IP changes, update IP address in Jenkins -> 
+5. whenver server IP changes, update IP address in Jenkins ->  (otherwise, response will be slow)
 
 
 
