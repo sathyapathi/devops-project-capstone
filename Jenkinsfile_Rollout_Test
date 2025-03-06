@@ -29,7 +29,7 @@ pipeline {
                 script {
                     echo "Building the Maven package..."
                     timeout(time: 10, unit: 'MINUTES') {
-                        sh "mvn clean package -Ddockerfile=${DOCKERFILE_NAME}"
+                        sh "mvn clean package"
                     }
                 }
             }
