@@ -125,6 +125,7 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
 
 
+
 ########## Install Docker ##########
 1. sudo apt update
 2. sudo apt install docker.io
@@ -303,6 +304,7 @@ Webhooks → Full control ✅ (Allows Jenkins to trigger builds when changes are
 	Secret: Leave it blank (Jenkins doesn’t need it).
 	SSL Verification: Keep default.
 4. Click Add Webhook.
+5. Change IP address whenever there is jenkins server IP change
 
 
 ## Test the Webhook
