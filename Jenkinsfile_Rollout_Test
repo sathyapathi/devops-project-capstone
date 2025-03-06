@@ -82,6 +82,12 @@ pipeline {
                 }
             }
         }
+		
+        stage('Post Build Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
     }
 
     post {
