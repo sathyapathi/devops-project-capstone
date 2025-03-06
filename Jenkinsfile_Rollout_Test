@@ -74,7 +74,10 @@ pipeline {
             }
         }
 
-        stage('Cleanup') {
+        
+		/*
+		// Cleaning up the workspace in Jenkins server
+		stage('Cleanup') {
             steps {
                 script {
                     echo "Cleaning up unused Docker images..."
@@ -82,6 +85,8 @@ pipeline {
                 }
             }
         }
+		*/
+		
 		
         stage('Post Build Cleanup') {
             steps {
