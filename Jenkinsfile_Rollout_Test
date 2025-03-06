@@ -73,10 +73,7 @@ pipeline {
                 }
             }
         }
-
         
-		/*
-		// Cleaning up the workspace in Jenkins server
 		stage('Cleanup') {
             steps {
                 script {
@@ -85,14 +82,17 @@ pipeline {
                 }
             }
         }
-		*/
 		
 		
+		/*
+		// Cleaning up the workspace in Jenkins server
         stage('Post Build Cleanup') {
             steps {
                 cleanWs()
             }
         }
+		*/
+		
     }
 
     post {
